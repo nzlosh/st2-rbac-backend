@@ -16,7 +16,7 @@
 from __future__ import absolute_import
 
 import six
-import unittest2
+import unittest
 from oslo_config import cfg
 
 from st2common.rbac.types import PermissionType
@@ -281,7 +281,7 @@ class BasePermissionsResolverTestCase(CleanDbTestCase):
         UserRoleAssignment.add_or_update(role_assignment_db)
 
 
-class PermissionsResolverUtilsTestCase(unittest2.TestCase):
+class PermissionsResolverUtilsTestCase(unittest.TestCase):
     def setUp(self):
         super(PermissionsResolverUtilsTestCase, self).setUp()
 

@@ -16,7 +16,7 @@
 from __future__ import absolute_import
 import os
 
-import unittest2
+import unittest
 import mock
 import jsonschema
 
@@ -29,7 +29,7 @@ __all__ = [
 ]
 
 
-class RBACDefinitionsLoaderTestCase(unittest2.TestCase):
+class RBACDefinitionsLoaderTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         config.parse_args()
@@ -121,7 +121,7 @@ class RBACDefinitionsLoaderTestCase(unittest2.TestCase):
         loader._get_role_definitions_file_paths.return_value = file_paths
 
         result = loader.load_role_definitions()
-        self.assertItemsEqual(result, [])
+        self.assertCountEqual(result, [])
 
     def test_load_role_definitions_empty_definition_file(self):
         loader = RBACDefinitionsLoader()
@@ -163,7 +163,7 @@ class RBACDefinitionsLoaderTestCase(unittest2.TestCase):
         loader._get_role_assiginments_file_paths.return_value = file_paths
 
         result = loader.load_user_role_assignments()
-        self.assertItemsEqual(result, [])
+        self.assertCountEqual(result, [])
 
     def test_load_user_role_assignments_empty_definition_file(self):
         loader = RBACDefinitionsLoader()
