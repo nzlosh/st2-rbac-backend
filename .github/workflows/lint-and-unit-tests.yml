@@ -13,7 +13,7 @@ on:
 jobs:
   build-and-test-python:
     runs-on: ubuntu-22.04
-    # NOTE: Copied from https://github.com/StackStorm/st2/blob/ea35b8cd8fb80317c241b106a2e55dc6e7f421e9/.github/workflows/ci.yaml#L409
+    # Services section copied from https://github.com/StackStorm/st2/.github/workflows/ci.yaml#L446
     services:
       mongo:
         image: mongo:7.0
@@ -21,17 +21,17 @@ jobs:
           - 27017:27017
 
       # In GHA, these services are started first before the code is checked out.
-      # We use bitnami images to facilitate reconfiguring RabbitMQ during ci-integration tests.
+      # We need to reconfigure RabbitMQ during ci-integration tests.
       # We rely on custom config and SSL certs that are in the repo.
       # Many images require config in env vars (which we can't change during the test job)
       # or they require config in entrypoint args (which we can't override for GHA services)
-      # bitnami builds ways to get config files from mounted volumes.
+      # so we use RabbitMQ's conf.d feature to get config files from mounted volumes.
       rabbitmq:
-        image: bitnami/rabbitmq:3.8
+        image: rabbitmq:3.13
         volumes:
-          - /home/runner/rabbitmq_conf:/bitnami/conf  # RABBITMQ_MOUNTED_CONF_DIR
+          - /home/runner/rabbitmq_conf:/etc/rabbitmq/conf.d  # RABBITMQ_MOUNTED_CONF_DIR
         env:
-          # tell bitnami/rabbitmq to enable this by default
+          # tell rabbitmq to enable this by default
           RABBITMQ_PLUGINS: rabbitmq_management
           RABBITMQ_USERNAME: guest
           RABBITMQ_PASSWORD: guest
@@ -41,7 +41,7 @@ jobs:
           --name rabbitmq
 
         ports:
-          # These 6 ports are exposed by bitnami/rabbitmq (see https://www.rabbitmq.com/networking.html#ports)
+          # These 6 ports are exposed by rabbitmq (see https://www.rabbitmq.com/networking.html#ports)
           # host_port:container_port/protocol
           - 5671:5671/tcp   # AMQP SSL port
           - 5672:5672/tcp   # AMQP standard port
@@ -53,7 +53,7 @@ jobs:
 
       redis:
         # Docker Hub image
-        image: redis
+        image: redis:8.0
         # Set health checks to wait until redis has started
         options: >-
           --name "redis"
