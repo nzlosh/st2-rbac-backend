@@ -16,7 +16,7 @@ jobs:
     # Services section copied from https://github.com/StackStorm/st2/.github/workflows/ci.yaml#L446
     services:
       mongo:
-        image: mongo:7.0
+        image: mongo:8.2
         ports:
           - 27017:27017
 
@@ -27,7 +27,7 @@ jobs:
       # or they require config in entrypoint args (which we can't override for GHA services)
       # so we use RabbitMQ's conf.d feature to get config files from mounted volumes.
       rabbitmq:
-        image: rabbitmq:3.13
+        image: rabbitmq:4.2
         volumes:
           - /home/runner/rabbitmq_conf:/etc/rabbitmq/conf.d  # RABBITMQ_MOUNTED_CONF_DIR
         env:
@@ -53,7 +53,7 @@ jobs:
 
       redis:
         # Docker Hub image
-        image: redis:8.0
+        image: redis:8.6
         # Set health checks to wait until redis has started
         options: >-
           --name "redis"
@@ -68,10 +68,9 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - "3.8"
-          - "3.9"
           - "3.10"
           - "3.11"
+          - "3.12"
     steps:
       - uses: actions/checkout@v3
 
