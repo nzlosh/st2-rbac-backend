@@ -19,6 +19,8 @@ VIRTUALENV_DIR ?= virtualenv
 ST2_REPO_PATH ?= /tmp/st2
 ST2_REPO_URL ?= https://github.com/StackStorm/st2.git
 ST2_REPO_BRANCH ?= master
+PYBIN := python3
+PIPBIN := pip3
 
 # nasty hack to get a space into a variable
 empty:=
@@ -89,7 +91,7 @@ compile:
 compilepy3:
 	@echo "======================= compile ========================"
 	@echo "------- Compile all .py files (syntax check test - Python 3) ------"
-	@if python3 -c 'import compileall,re; compileall.compile_dir(".", rx=re.compile(r"/virtualenv|virtualenv-osx|virtualenv-py3|.tox|.git|.venv-st2devbox|./st2tests/st2tests/fixtures/packs/test"), quiet=True)' | grep .; then exit 1; else exit 0; fi
+	@if $(PYBIN) -c 'import compileall,re; compileall.compile_dir(".", rx=re.compile(r"/virtualenv|virtualenv-osx|virtualenv-py3|.tox|.git|.venv-st2devbox|./st2tests/st2tests/fixtures/packs/test"), quiet=True)' | grep .; then exit 1; else exit 0; fi
 
 .PHONY: .flake8
 .flake8:
@@ -147,7 +149,7 @@ compilepy3:
 	@echo "==================== cloning st2 repo ===================="
 	@echo
 	@rm -rf /tmp/st2
-	@git clone $(ST2_REPO_URL)  --depth 1 --single-branch --branch $(ST2_REPO_BRANCH) $(ST2_REPO_PATH)
+	@git clone $(ST2_REPO_URL) --depth 1 --single-branch --branch $(ST2_REPO_BRANCH) $(ST2_REPO_PATH)
 
 # NOTE: We pass --no-deps to the script so we don't install all the
 # package dependencies which are already installed as part of "requirements"
@@ -161,17 +163,17 @@ compilepy3:
 		echo "==========================================================="; \
 		echo "Installing runner:" $$component; \
 		echo "==========================================================="; \
-        	(. $(VIRTUALENV_DIR)/bin/activate; cd $$component; python3 setup.py develop --no-deps); \
+		(. $(VIRTUALENV_DIR)/bin/activate; cd $$component; $(PYBIN) -m pip install --no-deps --editable .); \
 	done
 	@echo ""
 	@echo "================== register metrics drivers ======================"
 	@echo ""
 	# Install st2common to register metrics drivers
-	(. $(VIRTUALENV_DIR)/bin/activate; cd $(ST2_REPO_PATH)/st2common; python3 setup.py develop --no-deps)
+	(. $(VIRTUALENV_DIR)/bin/activate; cd $(ST2_REPO_PATH)/st2common; $(PYBIN) -m pip install --no-deps --editable .)
 	@echo ""
 	@echo "================== register rbac backend ======================"
 	@echo ""
-	(. $(VIRTUALENV_DIR)/bin/activate; python3 setup.py develop --no-deps)
+	(. $(VIRTUALENV_DIR)/bin/activate; $(PYBIN) -m pip install --no-deps --editable .)
 
 # NOTE: We pass --no-deps to the script so we don't install all the
 # package dependencies which are already installed as part of "requirements"
@@ -196,17 +198,17 @@ requirements: .clone_st2_repo virtualenv
         echo "==========================================================="; \
         echo "Installing runner:" $$component; \
         echo "==========================================================="; \
-        (. $(VIRTUALENV_DIR)/bin/activate; cd $$component; python3 setup.py develop); \
+        (. $(VIRTUALENV_DIR)/bin/activate; cd $$component; $(PYBIN) -m pip install --editable .); \
 	done
 	@echo ""
 	@echo "================== register metrics drivers ======================"
 	@echo ""
 	# Install st2common to register metrics drivers
-	(. $(VIRTUALENV_DIR)/bin/activate; cd $(ST2_REPO_PATH)/st2common; python3 setup.py develop --no-deps)
+	(. $(VIRTUALENV_DIR)/bin/activate; cd $(ST2_REPO_PATH)/st2common; $(PYBIN) -m pip install --no-deps --editable .)
 	@echo ""
 	@echo "================== register rbac backend ======================"
 	@echo ""
-	(. $(VIRTUALENV_DIR)/bin/activate; python3 setup.py develop --no-deps)
+	(. $(VIRTUALENV_DIR)/bin/activate; $(PYBIN) -m pip install --no-deps --editable .)
 
 .PHONY: requirements-ci
 requirements-ci:
@@ -226,7 +228,7 @@ $(VIRTUALENV_DIR)/bin/activate:
 	@echo
 	@echo "==================== virtualenv ===================="
 	@echo
-	test -d $(VIRTUALENV_DIR) || virtualenv $(VIRTUALENV_DIR) -p python3
+	test -d $(VIRTUALENV_DIR) || $(PYBIN) -m venv $(VIRTUALENV_DIR)
 
 	# Setup PYTHONPATH in bash activate script...
 	# Delete existing entries (if any)
